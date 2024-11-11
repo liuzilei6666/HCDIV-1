@@ -108,6 +108,11 @@
             -webkit-background-clip: text;  
             -webkit-text-fill-color: transparent;  
         }  
+
+        #error-message {  
+            color: red;  
+            margin-top: 1rem;  
+        }  
     </style>  
 </head>  
 <body>  
@@ -118,6 +123,8 @@
         <input type="text" class="search-input" placeholder="Search for an area" id="search-input">  
         <button class="search-button" onclick="searchWeather()">Search</button>  
     </div>  
+
+    <div id="error-message"></div>  
 
     <table>  
         <thead>  
@@ -130,22 +137,41 @@
     </table>  
 
     <script>  
+        // List of valid areas for case-insensitive and partial matching  
+        const validAreas = [  
+            "Ang Mo Kio", "Bedok", "Bishan", "Boon Lay", "Bukit Batok", "Bukit Merah",   
+            "Bukit Panjang", "Bukit Timah", "Central", "Changi", "Choa Chu Kang",   
+            "Clementi", "Geylang", "Hougang", "Jurong East", "Jurong West", "Kallang",   
+            "Marine Parade", "Pasir Ris", "Punggol", "Queenstown", "Sembawang",   
+            "Sengkang", "Serangoon", "Tampines", "Tanah Merah", "Toa Payoh", "Woodlands", "Yishun"  
+        ];  
+
         async function fetchWeather(area = '') {  
             try {  
-                const url = new URL('https://api.data.gov.sg/v1/environment/2-hour-weather-forecast');  
-                if (area) {  
-                    url.searchParams.set('area', area);  
-                }  
-                const response = await fetch(url);  
+                const response = await fetch('https://api.data.gov.sg/v1/environment/2-hour-weather-forecast');  
                 const data = await response.json();  
 
                 if (data.items && data.items.length > 0 && data.items[0].forecasts) {  
                     const forecasts = data.items[0].forecasts;  
-                    updateWeatherTable(forecasts);  
+                    
+                    // If area is provided, filter the forecasts  
+                    const filteredForecasts = area   
+                        ? forecasts.filter(f =>   
+                            f.area.toLowerCase().includes(area.toLowerCase())  
+                        )   
+                        : forecasts;  
+
+                    if (filteredForecasts.length > 0) {  
+                        updateWeatherTable(filteredForecasts);  
+                        document.getElementById('error-message').textContent = '';  
+                    } else {  
+                        showError(`No results found for "${area}". Try another area.`);  
+                    }  
                 } else {  
-                    console.error("No weather data found in the response.");  
+                    showError("No weather data available.");  
                 }  
             } catch (error) {  
+                showError("Failed to fetch weather data. Please try again later.");  
                 console.error("Failed to fetch weather data:", error);  
             }  
         }  
@@ -163,9 +189,32 @@
         function searchWeather() {  
             const searchInput = document.getElementById('search-input');  
             const searchTerm = searchInput.value.trim();  
+
+            // Validate input  
+            if (searchTerm === '') {  
+                fetchWeather(); // Fetch all areas if no input  
+                return;  
+            }  
+
             fetchWeather(searchTerm);  
         }  
 
+        function showError(message) {  
+            const errorElement = document.getElementById('error-message');  
+            const tableBody = document.getElementById('weather-data');  
+            
+            errorElement.textContent = message;  
+            tableBody.innerHTML = ''; // Clear previous results  
+        }  
+
+        // Add event listener for Enter key  
+        document.getElementById('search-input').addEventListener('keypress', function(e) {  
+            if (e.key === 'Enter') {  
+                searchWeather();  
+            }  
+        });  
+
+        // Fetch initial weather data  
         fetchWeather();  
     </script>  
 </body>  
