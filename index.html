@@ -1,74 +1,84 @@
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>2-Hour Weather Forecast For Singapore</title>  
+    <style>  
+        body {  
+            font-family: "Helvetica Neue", Arial, sans-serif;  
+            text-align: center;  
+            padding-top: 40px;  
+            color: #4b5563; /* Gray-600 */  
+        }  
+        h1 {  
+            font-family: "Helvetica Neue", Arial, sans-serif;  
+            color: #1f2937; /* Gray-800 */  
+            font-size: 2.25rem; /* 36px */  
+            font-weight: 700;  
+            margin-bottom: 1rem;  
+        }  
+        p {  
+            font-family: "Helvetica Neue", Arial, sans-serif;  
+            color: #1f2937; /* Gray-800 */  
+            font-size: 2.25rem; /* 36px */  
+            font-weight: 500;  
+            margin-bottom: 2rem;  
+        }  
+        table {  
+            margin: 0 auto;  
+            border-collapse: collapse;  
+            width: 80%;  
+            background-color: #f9fafb; /* Gray-50 */  
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);  
+        }  
+        th, td {  
+            border: 1px solid #e5e7eb; /* Gray-200 */  
+            padding: 0.75rem 1rem;  
+            font-size: 0.875rem; /* 14px */  
+            color: #6b7280; /* Gray-500 */  
+        }  
+        th {  
+            background-color: #f3f4f6; /* Gray-100 */  
+            font-weight: 600;  
+            color: #374151; /* Gray-700 */  
+        }  
+    </style>  
+</head>  
+<body>  
+    <h1>2-Hour Weather Forecast For Singapore</h1>  
+    <p>Liu Zilei 1009612</p>  
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2-Hour Weather Forecast For Singapore</title>
-    <style>
-        body {
-            font-family: "Helvetica Neue", Arial, sans-serif;
-            text-align: center;
-            padding-top: 40px;
-            color: grey;
-        }
-        h1 {
-            font-family: "Helvetica Neue", Arial, sans-serif;
-            color: black; 
-        }
-        p {
-            font-family: "Helvetica Neue", Arial, sans-serif;
-            color:black; 
-            font-size: 40px;
-        }
-        table {
-            margin: 0 auto;
-            border-collapse: collapse;
-            width: 60%;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 6px;
-            font-size: 14px;
-            color: brown; 
-        }
-    </style>
-</head>
-<body>
-    <h1>2-Hour Weather Forecast For Singapore </h1>
-    <p>Liu Zilei 1009612</p >
+    <table>  
+        <thead>  
+            <tr>  
+                <th>Area</th>  
+                <th>Forecast</th>  
+            </tr>  
+        </thead>  
+        <tbody id="weather-data"></tbody>  
+    </table>  
 
-    <table>
-        <thead>
-            <tr>
-                <th>Area</th>
-                <th>Forecast</th>
-            </tr>
-        </thead>
-        <tbody id="weather-data"></tbody>
-    </table>
+    <script>  
+        async function fetchWeather() {  
+            try {  
+                const response = await fetch('https://api.data.gov.sg/v1/environment/2-hour-weather-forecast');  
+                const data = await response.json();  
+                const forecasts = data.items[0].forecasts;  
 
-    <script>
-        async function fetchWeather() {
-            try {
-                const response = await fetch('https://api.data.gov.sg/v1/environment/2-hour-weather-forecast');
-                const data = await response.json();
-                const forecasts = data.items[0].forecasts;
+                const tableBody = document.getElementById('weather-data');  
+                tableBody.innerHTML = '';  
 
-                const tableBody = document.getElementById('weather-data');
-                tableBody.innerHTML = '';
+                forecasts.forEach(forecast => {  
+                    const row = `<tr><td>${forecast.area}</td><td>${forecast.forecast}</td></tr>`;  
+                    tableBody.innerHTML += row;  
+                });  
+            } catch (error) {  
+                console.error("Failed to fetch weather data:", error);  
+            }  
+        }  
 
-                forecasts.forEach(forecast => {
-                    const row = `<tr><td>${forecast.area}</td><td>${forecast.forecast}</td></tr>`;
-                    tableBody.innerHTML += row;
-                });
-            } catch (error) {
-                console.error("Failed to fetch weather data:", error);
-            }
-        }
-
-        fetchWeather();
-    </script>
-</body>
+        fetchWeather();  
+    </script>  
+</body>  
 </html>
-
