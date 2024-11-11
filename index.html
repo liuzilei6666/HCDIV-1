@@ -128,15 +128,20 @@
                 }  
                 const response = await fetch(url);  
                 const data = await response.json();  
-                const forecasts = data.items[0].forecasts;  
 
-                const tableBody = document.getElementById('weather-data');  
-                tableBody.innerHTML = '';  
+                if (data.items && data.items.length > 0 && data.items[0].forecasts) {  
+                    const forecasts = data.items[0].forecasts;  
 
-                forecasts.forEach(forecast => {  
-                    const row = `<tr><td><span class="city-name">${forecast.area}</span></td><td>${forecast.forecast}</td></tr>`;  
-                    tableBody.innerHTML += row;  
-                });  
+                    const tableBody = document.getElementById('weather-data');  
+                    tableBody.innerHTML = '';  
+
+                    forecasts.forEach(forecast => {  
+                        const row = `<tr><td><span class="city-name">${forecast.area}</span></td><td>${forecast.forecast}</td></tr>`;  
+                        tableBody.innerHTML += row;  
+                    });  
+                } else {  
+                    console.error("No weather data found in the response.");  
+                }  
             } catch (error) {  
                 console.error("Failed to fetch weather data:", error);  
             }  
@@ -145,14 +150,10 @@
         function searchWeather() {  
             const searchInput = document.getElementById('search-input');  
             const searchTerm = searchInput.value.trim();  
-            if (searchTerm) {  
-                fetchWeather(searchTerm);  
-            } else {  
-                fetchWeather();  
-            }  
+            fetchWeather(searchTerm);  
         }  
 
         fetchWeather();  
     </script>  
 </body>  
-</html> 
+</html>  
